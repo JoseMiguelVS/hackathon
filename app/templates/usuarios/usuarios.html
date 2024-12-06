@@ -1,0 +1,114 @@
+{% block body %}
+<h2>Usuarios</h2> 
+<br>
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+        {% endif %} alert-dismissible fade show" role="alert">
+        <strong>{{message}}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<!-- -------------------------------------BUSCADOR------------------------------------------ -->
+<div >
+    <div >
+            <h2></h2>
+    </div>
+    <div > 
+        <form method="get" action="{{ url_for('usuarios.usuariosBuscar') }}" class="d-flex">
+            <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
+                            placeholder="Buscar..." required>
+                    <button type="submit"><i
+                                    class="fas fa-search"></i> </button>
+            </form>
+    </div>
+
+
+<!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
+ <div><a href="{{url_for('usuarios.usuario_agregar')}}">Nuevo</a></div>
+
+<!-- ------------------------------TABLE -------------------------------- -->
+     <table >
+        <thead>
+            <tr>
+                <th>Ver</th>
+                <th>Nombre</th>
+                <th>Apellido paterno</th>
+                <th>Apellido materno</th>
+                <th>Correo</th>
+            </tr>
+        </thead>
+        <tbody>
+                {% if usuarios %}
+                {% for usuario in usuarios %}
+                {% if usuario.estado == True %}
+            <tr>
+                <td>
+                        <div>
+                                <a href="{{url_for('usuarios.usuario_detalles',id = usuario.id_usuario)}}">Ver mas</a>
+                        </div>
+                </td>
+                <td>{{usuario.nombre_usuario}}</td>
+                <td>{{usuario.apellido_pat}}</td>
+                <td>{{usuario.apellido_mat}}</td>
+                <td>{{usuario.correo_usuario}}</td>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <tr>
+                        <td align="center" colspan="8">No existen usuarios</td>
+                </tr>
+                {% endif %}
+            </tr>
+        </tbody>
+     </table>
+     <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
+<nav aria-label="Page navigation example" class="justify-content-center">
+    <ul class="pagination justify-content-center" style="margin:20px 0">
+            {% if page > 1 %}
+            <li class="page-item">
+                    <a class="page-link" href="{{url_for('usuariosBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                            aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                    </a>
+            </li>
+            {% if page != 1 and page != 2 %}
+            <li class="page-item"><a class="page-link" href="{{url_for('usuariosBuscar')}}">1</a></li>
+            {% if page != 3 %}
+            <li class="page-item"><a class="page-link disabled">...</a></li>
+            {% endif %}
+            {% endif %}
+            <li class="page-item"><a class="page-link"
+                            href="{{url_for('usuariosBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item"><a class="page-link active" href="#">{{page}}</a></li>
+
+            {% if page < total_pages %} <li class="page-item"><a class="page-link"
+                            href="{{url_for('usuariosBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                    </li>
+                    {% if page != total_pages and page != total_pages-1 %}
+                    {% if page != total_pages-2 %}
+                    <li class="page-item"><a class="page-link disabled">...</a></li>
+                    {% endif %}
+                    <li class="page-item"><a class="page-link"
+                                    href="{{url_for('usuariosBuscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                    </li>
+                    {% endif %}
+                    <li class="page-item">
+                            <a class="page-link"
+                                    href="{{url_for('usuariosBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                                    aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                            </a>
+                    </li>
+                    {% endif %}
+    </ul>
+</nav>
+{% endblock %}

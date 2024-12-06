@@ -1,0 +1,51 @@
+{% block title %} {{titulo}} {% endblock %}
+{% block body %}
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+    {% endif %} alert-dismissible fade show" role="alert">
+    <strong>{{message}}</strong>
+    <button type="button" class="" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- ------------------------------------------------------------------------------------------- -->
+
+<form method="POST" action="{{url_for('usuarios.usuario_nuevo')}}" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    <div>
+        <div>
+            <label for="nombre_usuario">Nombre(s)</label>
+            <input type="text" class="" id="nombre_usuario" placeholder="Nombre" name="nombre_usuario" required>
+        </div>
+        <div>
+            <label for="apellido_pat">Apellido Paterno</label>
+            <input type="text" id="apellido_pat" placeholder="Apellido Paterno" name="apellido_pat" required>
+        </div>
+        <div>
+            <label for="apellido_mat">Apellido Materno</label>
+            <input type="text" id="apellido_mat" placeholder="Apellido Materno" name="apellido_mat" required>
+        </div>
+       
+        <div>
+            <label for="contrasenia">Contraseña</label>
+            <input type="password" id="contrasenia" placeholder="Contraseña" name="contrasenia"
+                required>
+        </div>
+        <div>
+            <label for="correo_usuario">Correo Electrónico</label>
+        <input type="text" id="correo_usuario" placeholder="Correo Electronico" name="correo_usuario"
+          required>
+        </div>
+    </div>
+    <div>
+        <a href="{{url_for('usuarios.usuariosBuscar')}}">Cancelar</a>
+        <button type="submit">Guardar</button>
+      </div>
+</form>
+
+{% endblock %}

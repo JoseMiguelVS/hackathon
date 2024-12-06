@@ -1,0 +1,31 @@
+{% block body %}
+<h2>Detalles de Usuario</h2>
+<p class="fc">Fecha creación: {{ usuario.fecha_creado }}</p>
+<p class="fc">Fecha modificación: {{ usuario.fecha_editado }}</p>
+<br />
+<!-- ----------------------------------------------------------------------------------------------- -->
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Apellido Paterno</th>
+      <th>Apellido Materno</th>
+      <th>Correo Electrónico</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ usuario.nombre_usuario }}</td>
+      <td>{{ usuario.apellido_pat }}</td>
+      <td>{{ usuario.apellido_mat }}</td>
+      <td>{{ usuario.correo_usuario }}</td>
+    </tr>
+  </tbody>
+</table>
+<div>
+  <a
+    class="btn-act btn btn-outline-danger d-inline-flex align-items-center"
+    href="{{ url_for('usuarios.usuariosBuscar') }}"
+  >Cancelar</a>
+</div>
+{% endblock %}
