@@ -38,6 +38,21 @@ def usuarios_papelera():
                            total_items=paginado[3],
                            total_pages=paginado[4],
                            search_query = search_query)
+    
+@usuarios.route('/usuarios/papelera/restaurar/<string:id>')
+def usuarios_eliminar(id):
+    estado = True
+    fecha_editado = datetime.now()
+    con = get_db_connection()
+    cur = con.cursor()
+    sql = "UPDATE usuarios SET estado=%s,fecha_editado=%s WHERE id_usuario=%s"
+    valores = (estado, fecha_editado, id)
+    cur.execute(sql,valores)
+    con.commit()
+    cur.close()
+    con.close()
+    flash("Usuario restaurado correctamente")
+    return redirect(url_for('usuarios.usuariosBuscar'))
 
 @usuarios.route("/usuarios/agregar")
 def usuario_agregar():
@@ -95,4 +110,53 @@ def usuario_detalles(id):
         flash('El usuario no existe o ha sido eliminado.')
         return redirect(url_for('usuarios.usuariosBuscar'))
 
-    return render_template('usuarios/usuario_detalles.html', usuario=usuario)
+    return render_template('usuarios/usuario_detalles.html', usuario = usuario)
+
+@usuarios.route('/usuarios/editar/<string:id>')
+def usuario_editar(id):
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute('SELECT * FROM usuarios WHERE id_usuario={0}'.format(id))
+    usuario = cur.fetchall()
+    con.commit()
+    cur.close()
+    con.close()
+    return render_template('usuarios/usuario_editar.html',usuario = usuario[0])
+
+@usuarios.route('/usuarios/editar/<string:id>',methods=['POST'])
+def usuario_actualizar(id):
+    if request.method == 'POST':
+        nombre_usuario = request.form['nombre_usuario']
+        apellido_mat = request.form['apellido_mat']
+        apellido_pat = request.form['apellido_pat']
+        correo_usuario = request.form['correo_usuario']
+        contrasenia = request.form['contrasenia']
+        Pass = generate_password_hash(contrasenia)        
+        fecha_editado= datetime.now()
+        
+        con = get_db_connection()
+        cur = con.cursor()
+        sql="UPDATE usuarios SET nombre_usuario=%s,apellido_mat=%s,apellido_pat=%s,correo_usuario=%s,contrasenia_usuario=%s,fecha_editado=%s WHERE id_usuario=%s"
+        valores=(nombre_usuario,apellido_mat,apellido_pat,correo_usuario,Pass,fecha_editado,id)
+        cur.execute(sql,valores)
+        con.commit()
+        cur.close()
+        con.close()
+        flash("Usuario editado correctamente")
+    return redirect(url_for('usuarios.usuariosBuscar'))
+
+@usuarios.route('/usuarios/eliminar/<string:id>')
+def usuario_eliminar(id):
+    estado = False
+    fecha_editado = datetime.now()
+    con = get_db_connection()
+    cur = con.cursor()
+    sql = "UPDATE usuarios SET estado=%s,fecha_editado=%s WHERE id_usuario=%s"
+    valores = (estado, fecha_editado, id)
+    cur.execute(sql,valores)
+    con.commit()
+    cur.close()
+    con.close()
+    flash("Usuario eliminado correctamente")
+    return redirect(url_for('usuarios.usuariosBuscar'))
+
