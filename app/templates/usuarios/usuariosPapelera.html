@@ -1,6 +1,6 @@
 {% extends './layout.html' %}
 {% block body %}
-<h2>Usuarios</h2>
+<h2>Pepelera de Usuarios</h2>
 <br>
 <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
 {% with messages = get_flashed_messages() %}
@@ -28,10 +28,6 @@
                 </form>
         </div>
 
-
-        <!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
-        <div><a href="{{url_for('usuarios.usuario_agregar')}}">Nuevo</a></div>
-
         <!-- ------------------------------TABLE -------------------------------- -->
         <table>
                 <thead>
@@ -41,18 +37,17 @@
                                 <th>Apellido paterno</th>
                                 <th>Apellido materno</th>
                                 <th>Correo</th>
-                                <th>Editar</th>
-                                <th>Eliminar</th>
+                                <th>Restaurar</th>
                         </tr>
                 </thead>
                 <tbody>
                         {% if usuarios %}
                         {% for usuario in usuarios %}
-                        {% if usuario.estado == True %}
+                        {% if usuario.estado == false %}
                         <tr>
                                 <td>
                                         <div>
-                                                <a href="{{url_for('usuarios.usuario_detalles',id = usuario.id_usuario)}}">Ver mas</a>
+                                                <a href="{{url_for('usuarios.usuario_detallesPapelera',id = usuario.id_usuario)}}">Ver mas</a>
                                         </div>
                                 </td>
                                 <td>{{usuario.nombre_usuario}}</td>
@@ -60,13 +55,8 @@
                                 <td>{{usuario.apellido_mat}}</td>
                                 <td>{{usuario.correo_usuario}}</td>
                                 <td>
-                                        <div>
-                                                <a href="{{ url_for('usuarios.usuario_editar', id = usuario.id_usuario) }}">Editar</a>
-                                        </div>
-                                </td>
-                                <td>
                                         <button type="button" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop-{{usuario.id_usuario}}"> Eliminar
+                                                data-bs-target="#staticBackdrop-{{usuario.id_usuario}}">Restaurar
                                         </button>
                                 </td>
                                 {% endif %}
@@ -125,12 +115,6 @@
                 </ul>
         </nav>
 
-        <div>
-                <br>
-                <a href="{{ url_for('usuarios.usuarios_papelera') }}"
-                        class="btn btn-outline-danger d-inline-flex align-items-center">Papelera</a>
-        </div>
-
         <!-- --------------------------------------------------MODAL--------------------------------------------------- -->
         {% if usuarios %}
         {% for usuario in usuarios %}
@@ -144,15 +128,15 @@
                                                 aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                        ¿Deseas eliminar a <strong>{{ usuario.nombre_usuario }} {{
+                                        ¿Deseas restaurar a <strong>{{ usuario.nombre_usuario }} {{
                                                 usuario.apellido_pat}}</strong>?
                                 </div>
                                 <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Cancelar</button>
                                         <a class="btn btn-danger"
-                                                href="{{ url_for('usuarios.usuario_eliminar', id = usuario.id_usuario) }}"
-                                                class="btn-delete"><i class="fas fa-trash-alt"></i>Eliminar</a>
+                                                href="{{ url_for('usuarios.usuarios_restaurar', id = usuario.id_usuario) }}"
+                                                class="btn-delete"><i class="fas fa-trash-alt"></i>Restaurar</a>
                                 </div>
                         </div>
                 </div>

@@ -1,0 +1,51 @@
+{% extends './layout.html' %}
+{% block body %}
+<h2>Detalles de Usuario</h2>
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+        {% endif %} alert-dismissible fade show" role="alert">
+        <strong>{{message}}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+
+<p class="fc">Fecha creación: {{ usuario.fecha_creado }}</p>
+<p class="fc">Fecha modificación: {{ usuario.fecha_editado }}</p>
+<br />
+<!-- ----------------------------------------------------------------------------------------------- -->
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Apellido Paterno</th>
+      <th>Apellido Materno</th>
+      <th>Correo Electrónico</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ usuario.nombre_usuario }}</td>
+      <td>{{ usuario.apellido_pat }}</td>
+      <td>{{ usuario.apellido_mat }}</td>
+      <td>{{ usuario.correo_usuario }}</td>
+    </tr>
+  </tbody>
+</table>
+<div>
+    <a href="{{ url_for('usuarios.usuarios_restaurar', id = usuario.id_usuario) }}">Restaurar</a>
+</div>
+<div>
+  <a href="{{ url_for('usuarios.usuarios_papelera') }}">Cancelar</a>
+</div>
+
+ 
+
+{% endblock %}

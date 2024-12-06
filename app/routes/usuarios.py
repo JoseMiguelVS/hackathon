@@ -25,34 +25,7 @@ def usuariosBuscar():
                            total_pages=paginado[4],
                            search_query = search_query)
 
-@usuarios.route("/usuarios/papelera")
-def usuarios_papelera():
-    search_query = request.args.get('buscar', '', type=str)
-    sql_count ='SELECT COUNT(*) FROM usuarios WHERE estado = true AND (nombre_usuario ILIKE %s OR correo_usuario ILIKE %s);'
-    sql_lim ='SELECT * FROM usuarios WHERE estado = false AND (nombre_usuario ILIKE %s OR correo_usuario ILIKE %s) ORDER BY id_usuario DESC LIMIT %s OFFSET %s;'
-    paginado = paginador1(sql_count,sql_lim,search_query,1,5)
-    return render_template('usuarios/usuarios.html',
-                           usuarios=paginado[0],
-                           page=paginado[1],
-                           per_page=paginado[2],
-                           total_items=paginado[3],
-                           total_pages=paginado[4],
-                           search_query = search_query)
-    
-@usuarios.route('/usuarios/papelera/restaurar/<string:id>')
-def usuarios_eliminar(id):
-    estado = True
-    fecha_editado = datetime.now()
-    con = get_db_connection()
-    cur = con.cursor()
-    sql = "UPDATE usuarios SET estado=%s,fecha_editado=%s WHERE id_usuario=%s"
-    valores = (estado, fecha_editado, id)
-    cur.execute(sql,valores)
-    con.commit()
-    cur.close()
-    con.close()
-    flash("Usuario restaurado correctamente")
-    return redirect(url_for('usuarios.usuariosBuscar'))
+
 
 @usuarios.route("/usuarios/agregar")
 def usuario_agregar():
@@ -105,11 +78,9 @@ def usuario_detalles(id):
             # Asegúrate de usar parámetros para evitar inyección SQL
             cur.execute('SELECT * FROM usuarios WHERE id_usuario = %s', (id,))
             usuario = cur.fetchone()  # Recupera solo un registro
-
     if usuario is None:
         flash('El usuario no existe o ha sido eliminado.')
         return redirect(url_for('usuarios.usuariosBuscar'))
-
     return render_template('usuarios/usuario_detalles.html', usuario = usuario)
 
 @usuarios.route('/usuarios/editar/<string:id>')
@@ -159,4 +130,45 @@ def usuario_eliminar(id):
     con.close()
     flash("Usuario eliminado correctamente")
     return redirect(url_for('usuarios.usuariosBuscar'))
+# -------------------------------PAPELERA DE USUARIOS------------------------------------------------------
 
+@usuarios.route("/usuarios/papelera")
+def usuarios_papelera():
+    search_query = request.args.get('buscar', '', type=str)
+    sql_count ='SELECT COUNT(*) FROM usuarios WHERE estado = true AND (nombre_usuario ILIKE %s OR correo_usuario ILIKE %s);'
+    sql_lim ='SELECT * FROM usuarios WHERE estado = false AND (nombre_usuario ILIKE %s OR correo_usuario ILIKE %s) ORDER BY id_usuario DESC LIMIT %s OFFSET %s;'
+    paginado = paginador1(sql_count,sql_lim,search_query,1,5)
+    return render_template('usuarios/usuariosPapelera.html',
+                           usuarios=paginado[0],
+                           page=paginado[1],
+                           per_page=paginado[2],
+                           total_items=paginado[3],
+                           total_pages=paginado[4],
+                           search_query = search_query)
+
+@usuarios.route('/usuarios/papelera/detalles/<int:id>')
+def usuario_detallesPapelera(id):
+    with get_db_connection() as con:
+        with con.cursor(cursor_factory=RealDictCursor) as cur:
+            # Asegúrate de usar parámetros para evitar inyección SQL
+            cur.execute('SELECT * FROM usuarios WHERE id_usuario = %s', (id,))
+            usuario = cur.fetchone()  # Recupera solo un registro
+    if usuario is None:
+        flash('El usuario no existe o ha sido eliminado.')
+        return redirect(url_for('usuarios.usuariosBuscar'))
+    return render_template('usuarios/usuario_detallesPapelera.html', usuario = usuario)
+
+@usuarios.route('/usuarios/papelera/restaurar/<string:id>')
+def usuarios_restaurar(id):
+    estado = True
+    fecha_editado = datetime.now()
+    con = get_db_connection()
+    cur = con.cursor()
+    sql = "UPDATE usuarios SET estado=%s,fecha_editado=%s WHERE id_usuario=%s"
+    valores = (estado, fecha_editado, id)
+    cur.execute(sql,valores)
+    con.commit()
+    cur.close()
+    con.close()
+    flash("Usuario restaurado correctamente")
+    return redirect(url_for('usuarios.usuariosBuscar'))
