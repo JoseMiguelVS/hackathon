@@ -228,43 +228,22 @@ def detallesListadoMaes():
     cur = con.cursor()
     
     # Ejecutar la consulta y obtener los datos
-    cur.execute('SELECT * FROM documentos')
-    data = cur.fetchall()  # Devuelve una lista de tuplas con los datos
+    cur.execute('SELECT * FROM documentos')  # Obtener solo la columna relevante
+    rows = cur.fetchall()  # Lista de tuplas
+    
+    documentos = []
+    for row in rows:
+        try:
+            json_data = json.loads(row[0])  # Intentar deserializar el JSON
+            documentos.extend(json_data)  # Agregar los datos a la lista
+        except (json.JSONDecodeError, TypeError):
+            # Manejar el caso de valores no JSON o problemas con la conversión
+            print(f"Error procesando fila: {row}")
+            continue  # O puedes loggear este problema
     
     con.commit()
     cur.close()
     con.close()
     
-    # Crear el PDF
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    
-    # Título del documento
-    pdf.set_font("Arial", style="B", size=16)
-    pdf.cell(0, 10, "Listado de Documentos", ln=True, align="C")
-    pdf.ln(10)  # Espacio después del título
-    
-    # Tabla con los datos
-    pdf.set_font("Arial", size=12)
-    pdf.cell(40, 10, "Código Documento", border=1, align="C")
-    pdf.cell(40, 10, "Número Revisión", border=1, align="C")
-    pdf.cell(50, 10, "Fecha Emisión", border=1, align="C")
-    pdf.cell(50, 10, "Fecha Revisión", border=1, align="C")
-    pdf.ln()  # Salto de línea para la siguiente fila
-    
-    # Insertar datos en la tabla
-    for item in data:
-        pdf.cell(40, 10, item[0], border=1)  # Código Documento (ajusta índice según la consulta)
-        pdf.cell(40, 10, item[1], border=1)  # Número Revisión
-        pdf.cell(50, 10, item[2], border=1)  # Fecha Emisión
-        pdf.cell(50, 10, item[3], border=1)  # Fecha Revisión
-        pdf.ln()
-    
-    # Convertir el PDF a un archivo descargable
-    response = make_response(pdf.output(dest='S').encode('latin1'))
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'inline; filename=ListadoDocumentos.pdf'
-    
-    return response
-    # return render_template('informacionDocumentada/detalleListado.html')
+    # Pasar los datos al render_template
+    return render_template('informacionDocumentada/detalleListado.html', documentos=documentos)

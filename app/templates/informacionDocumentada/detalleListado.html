@@ -1,5 +1,22 @@
 {% extends './layout.html' %} {% block body %}
 
-
+<table>
+    <thead>
+        <th>Código del Documento</th>
+        <th>Número de Revisión</th>
+        <th>Fecha de Emisión</th>
+        <th>Fecha de Revisión</th>
+    </thead>
+    <tbody>
+        {% for documento in documentos %}
+        <tr>
+            <td>{{ documento.codigoDocumento }}</td>
+            <td>{{ documento.numeroRevision }}</td>
+            <td>{{ documento.fechaEmision }}</td>
+            <td>{{ documento.fechaRevision }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}
