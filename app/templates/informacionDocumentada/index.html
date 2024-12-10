@@ -1,27 +1,121 @@
-<form method="POST" action="{{ url_for('guardar_documento') }}">
-    <div class="modal-body">
-      <!-- Documentos -->
-      <div class="mb-3">
-        <label for="codigoDocumento1" class="form-label">Código del Documento</label>
-        <input type="text" class="form-control" id="codigoDocumento1" name="documentos[0][codigoDocumento]" required />
-      </div>
-      <div class="mb-3">
-        <label for="numeroRevision1" class="form-label">Número de Revisión</label>
-        <input type="text" class="form-control" id="numeroRevision1" name="documentos[0][numeroRevision]" required />
-      </div>
-      <div class="mb-3">
-        <label for="fechaEmision1" class="form-label">Fecha de Emisión</label>
-        <input type="date" class="form-control" id="fechaEmision1" name="documentos[0][fechaEmision]" required />
-      </div>
-      <div class="mb-3">
-        <label for="fechaRevision1" class="form-label">Fecha de Revisión</label>
-        <input type="date" class="form-control" id="fechaRevision1" name="documentos[0][fechaRevision]" required />
+{% extends './layout.html' %} {% block body %}
+<div class="container mt-5">
+  <div class="row row-cols-2 row-cols-md-3 g-4">
+    <!-- Tarjeta 1 -->
+    <div class="col">
+      <div class="card h-100">
+        <img
+          src="{{ url_for('static',filename = 'img/1.png') }}"
+          class="card-img-top"
+          alt="..."
+        />
+        <div class="card-body">
+          <h5 class="card-title">Listado Maestro de Documentos</h5>
+        </div>
+        <div class="card-footer text-center">
+          <!-- Botón para abrir el modal -->
+           <a href="{{ url_for('usuarios.detallesListadoMaes')}}">Ver mas </a>
+          <!-- <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#documentoModal">Agregar Documento</button> -->
+        </div>
       </div>
     </div>
-  
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-      <button type="submit" class="btn btn-primary">Guardar</button>
+
+    <!-- Modal de Documentos -->
+    <div
+      class="modal fade"
+      id="documentoModal"
+      tabindex="-1"
+      aria-labelledby="documentoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <form
+          method="POST"
+          action="{{ url_for('usuarios.guardar_documento') }}"
+        >
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="documentoModalLabel">
+                Guardar Documento
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <!-- Documentos -->
+              <div class="mb-3">
+                <label for="codigoDocumento1" class="form-label"
+                  >Código del Documento</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="codigoDocumento1"
+                  name="documentos[0][codigoDocumento]"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="numeroRevision1" class="form-label"
+                  >Número de Revisión</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="numeroRevision1"
+                  name="documentos[0][numeroRevision]"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="fechaEmision1" class="form-label"
+                  >Fecha de Emisión</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="fechaEmision1"
+                  name="documentos[0][fechaEmision]"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="fechaRevision1" class="form-label"
+                  >Fecha de Revisión</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="fechaRevision1"
+                  name="documentos[0][fechaRevision]"
+                  required
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
-  </form>
-  
+
+</div>
+</div>
+{% endblock %}

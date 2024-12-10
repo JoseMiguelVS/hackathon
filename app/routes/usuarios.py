@@ -1,9 +1,12 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, Flask
+from flask import Blueprint, render_template, request, redirect, url_for, flash, Flask,make_response
 from flask_login import login_required, current_user
+from fpdf import FPDF
 from datetime import datetime
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash
+import json  # Importar el módulo json
+
 
 from .utils.utils import get_db_connection, paginador1, allowed_username
 
@@ -172,3 +175,96 @@ def usuarios_restaurar(id):
     con.close()
     flash("Usuario restaurado correctamente")
     return redirect(url_for('usuarios.usuariosBuscar'))
+
+@usuarios.route('/informacionDocumentada')
+def infoDocu():
+    return render_template('informacionDocumentada/index.html')
+
+@usuarios.route('/guardar_documento', methods=['POST'])
+def guardar_documento():
+    # Obtener los datos del formulario. Cada campo está dentro de un array debido al índice
+    documentos = request.form.getlist('documentos[0][codigoDocumento]')
+    revision = request.form.getlist('documentos[0][numeroRevision]')
+    fecha_emision = request.form.getlist('documentos[0][fechaEmision]')
+    fecha_revision = request.form.getlist('documentos[0][fechaRevision]')
+    
+    # Crear un array de diccionarios con los datos obtenidos
+    documentos_data = []
+    for i in range(len(documentos)):
+        documento = {
+            'codigoDocumento': documentos[i],
+            'numeroRevision': revision[i],
+            'fechaEmision': fecha_emision[i],
+            'fechaRevision': fecha_revision[i]
+        }
+        documentos_data.append(documento)
+    
+    # Convertir el array de diccionarios a una cadena JSON
+    documentos_json = json.dumps(documentos_data)
+    
+    # Insertar los datos en la base de datos
+    con = get_db_connection()
+    cur = con.cursor()
+    
+    # Usa comillas dobles si "array" es una columna reservada
+    sql = 'INSERT INTO documentos ("array") VALUES (%s)'
+    valores = (documentos_json,)
+    cur.execute(sql, valores)
+    
+    con.commit()
+    cur.close()
+    con.close()
+    
+    flash('Documento guardado correctamente')
+    return redirect(url_for('usuarios.infoDocu'))
+
+# @usuarios.route('/Detalles')
+# def detallesListado():
+#     return render_template("informacionDocumentada/detalleListado.html")
+
+@usuarios.route('/Detalles/Listado')
+def detallesListadoMaes():
+    con = get_db_connection()
+    cur = con.cursor()
+    
+    # Ejecutar la consulta y obtener los datos
+    cur.execute('SELECT * FROM documentos')
+    data = cur.fetchall()  # Devuelve una lista de tuplas con los datos
+    
+    con.commit()
+    cur.close()
+    con.close()
+    
+    # Crear el PDF
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Título del documento
+    pdf.set_font("Arial", style="B", size=16)
+    pdf.cell(0, 10, "Listado de Documentos", ln=True, align="C")
+    pdf.ln(10)  # Espacio después del título
+    
+    # Tabla con los datos
+    pdf.set_font("Arial", size=12)
+    pdf.cell(40, 10, "Código Documento", border=1, align="C")
+    pdf.cell(40, 10, "Número Revisión", border=1, align="C")
+    pdf.cell(50, 10, "Fecha Emisión", border=1, align="C")
+    pdf.cell(50, 10, "Fecha Revisión", border=1, align="C")
+    pdf.ln()  # Salto de línea para la siguiente fila
+    
+    # Insertar datos en la tabla
+    for item in data:
+        pdf.cell(40, 10, item[0], border=1)  # Código Documento (ajusta índice según la consulta)
+        pdf.cell(40, 10, item[1], border=1)  # Número Revisión
+        pdf.cell(50, 10, item[2], border=1)  # Fecha Emisión
+        pdf.cell(50, 10, item[3], border=1)  # Fecha Revisión
+        pdf.ln()
+    
+    # Convertir el PDF a un archivo descargable
+    response = make_response(pdf.output(dest='S').encode('latin1'))
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=ListadoDocumentos.pdf'
+    
+    return response
+    # return render_template('informacionDocumentada/detalleListado.html')

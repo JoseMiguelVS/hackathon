@@ -1,7 +1,16 @@
-from flask import Flask, request, redirect, url_for, flash
+from flask import Flask, request, redirect, url_for, flash, render_template
 from .utils.utils import get_db_connection
+import json  # Importar el módulo json
+from flask import Blueprint
+
+# Definir el Blueprint
+guardar_documentobp = Blueprint('guardar_documento', __name__)
 
 app = Flask(__name__)
+
+@app.route('/informacionDocumentada')
+def infoDocu():
+    return render_template('informacionDocumentada/index.html')
 
 @app.route('/guardar_documento', methods=['POST'])
 def guardar_documento():
@@ -11,10 +20,8 @@ def guardar_documento():
     fecha_emision = request.form.getlist('documentos[0][fechaEmision]')
     fecha_revision = request.form.getlist('documentos[0][fechaRevision]')
     
-    # Crear un array de diccionarios
+    # Crear un array de diccionarios con los datos obtenidos
     documentos_data = []
-    
-    # Aquí estamos asumiendo que los campos se envían como listas y tienen la misma longitud
     for i in range(len(documentos)):
         documento = {
             'codigoDocumento': documentos[i],
@@ -24,18 +31,20 @@ def guardar_documento():
         }
         documentos_data.append(documento)
     
-    # Mostrar los datos en consola (esto solo para verificar)
-    print(documentos_data)
+    # Convertir el array de diccionarios a una cadena JSON
+    documentos_json = json.dumps(documentos_data)
+    
+    # Mostrar el JSON en consola para verificar (esto solo para depuración)
+    print(documentos_json)
     
     # Insertar los datos en la base de datos
     con = get_db_connection()
     cur = con.cursor()
     
-    # Preparamos una consulta para insertar múltiples registros
-    for doc in documentos_data:
-        sql = "INSERT INTO documentos (codigo_documento, numero_revision, fecha_emision, fecha_revision) VALUES (%s, %s, %s, %s)"
-        valores = (doc['codigoDocumento'], doc['numeroRevision'], doc['fechaEmision'], doc['fechaRevision'])
-        cur.execute(sql, valores)
+    # Preparamos la consulta para insertar el JSON en la base de datos
+    sql = "INSERT INTO documentos (array) VALUES (%s)"
+    valores = (documentos_json,)  # El valor debe ser una tupla
+    cur.execute(sql, valores)
     
     con.commit()
     cur.close()

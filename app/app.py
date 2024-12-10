@@ -1,5 +1,7 @@
 from flask import Flask, Blueprint, render_template, url_for, redirect, request, flash, jsonify
 from flask_login import LoginManager
+from routes.informacionDocumentada import guardar_documentobp
+
 from routes.usuarios import usuarios # Importa el Blueprint
 
 import os
@@ -61,6 +63,8 @@ def logout():
 
 # Registro de Blueprints
 app.register_blueprint(usuarios)
+app.register_blueprint(guardar_documentobp)
+
 
 # Rutas principales
 @app.route("/")
