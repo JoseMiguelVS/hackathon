@@ -4,10 +4,10 @@
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #b02b2c; /* Fondo rojo */
+    background-color: #080606; /* Fondo rojo */
 }
 body{
-    background-color: #b02b2c; /* Fondo rojo */
+    background-color: #0c0808; /* Fondo rojo */
 }
 .container1 {
     max-width: 400px;
@@ -24,11 +24,11 @@ body{
 }
 .form-group input {
     padding: 10px;
-    border: 1px solid #b02b2c;
+    border: 1px solid #050303;
     border-radius: 3px;
 }
 .form-group input[type="submit"] {
-    background-color: #b02b2c;
+    background-color: #110a0a;
     color: #ffffff;
     cursor: pointer;
 }
